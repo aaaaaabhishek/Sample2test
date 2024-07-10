@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: POST-SERVICE
+  config:
+    import: optional:configserver:http://localhost:8083
+  datasource:
+    url: jdbc:mysql://localhost:3306/postdb
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+server:
+  port: 8086
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+management:
+  health:
+    circuit-breakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+resilience4j:
+  circuitBreaker:
+    instances:
+      commentBreaker:
+        registerHealthIndicator: true #// If set to true, it registers a health indicator for monitoring the circuit breaker's state.
+        failureRateThreshold: 50 #Sets the threshold percentage of failed calls beyond which the circuit breaker should open. Here, it's set to 50%, meaning if more than 50% of calls fail, the circuit breaker will open.
+        minimumNumberOfCalls: 5 #Defines the minimum number of calls that must be made before the circuit breaker starts monitoring failures and opens. Here, it's set to 5.
+        automaticTransitionFromOpenToHalfOpenEnabled: true #Determines whether the circuit breaker should automatically transition from the open state to the half-open state after a specified time. If true, it will attempt to transition to the half-open state after the specified waitDurationInOpenState.
+        permittedNumberOfCallsInHalfOpenState: 3 #Sets the maximum number of calls permitted in the half-open state. Here, it's set to 3.
+        waitDurationInOpenState: 6000 # Specifies the duration for which the circuit breaker remains open before attempting to transition to the half-open state. Here, it's set to 6000 milliseconds (6 seconds).
+        eventConsumerBufferSize: 10 #pecifies the size of the event consumer buffer, determining how many events can be buffered before being processed. Here, it's set to 10.
+        slidingWindowSize: 10 # Specifies the size of the sliding window used to monitor calls. Here, it's set to 10, meaning it will monitor the last 10 calls.
+        slidingWindowType: COUNT_BASED # Specifies the type of sliding window used for monitoring. Here, it's set to COUNT_BASED, indicating it will monitor based on the count of calls rather than time intervals.
+  retry:
+    instances:
+      commentRetry:
+         maxAttempts: 3
+         backoff:
+           delay: 1000
+  ratelimiter:
+    instances:
+      userRateLimiter:
+        limit-refresh-period: 4s
+        limit-for-period: 2
+        timeout-duration: 2s
