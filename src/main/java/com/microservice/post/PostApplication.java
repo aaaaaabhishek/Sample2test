@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableDiscoveryClient
 @EnableFeignClients
 public class PostApplication {
-	public static void main(String[] args) {
+	public static void man(String[] args) {
 		SpringApplication.run(PostApplication.class, args);
 	}
 }
